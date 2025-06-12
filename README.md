@@ -1,4 +1,4 @@
-#Bulk Email Sender Webpage
+##Bulk Email Sender Webpage
 ## ⚙️ How It Works
 
 This application allows users to send bulk emails efficiently. Here's the general workflow:
