@@ -1,0 +1,7 @@
+Flask
+Flask-WTF
+itsdangerous
+pymongo
+python-dotenv
+gunicorn
+pandas
