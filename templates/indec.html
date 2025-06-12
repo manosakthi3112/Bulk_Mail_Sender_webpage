@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Mailer Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Using Font Awesome CSS for better control and modern practice -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light text */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top for longer forms */
+            min-height: 100vh;
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(0, 150, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(100, 50, 200, 0.1) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            background-color: #1e1e1e; /* Slightly lighter dark for container */
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 700px;
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            margin-bottom: 40px; /* Add some space at the bottom */
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(0, 150, 255, 0.2);
+            padding-bottom: 20px;
+        }
+
+        header h1 {
+            font-family: 'Orbitron', sans-serif; /* Techy font */
+            color: #00aaff; /* AI blue */
+            font-size: 2.5em;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+        }
+        header h1 .fas { /* For icon in h1 */
+            margin-right: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            color: #b0b0b0;
+        }
+
+        /* Flash Messages Styling (ensure categories match Flask flash(..., category)) */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            border: 1px solid transparent;
+            display: flex; /* For aligning icon and text */
+            align-items: center;
+        }
+        .flash .fas { /* Icon inside flash message */
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        .flash-success {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border-color: #28a745;
+        }
+        .flash-error, .flash-danger { /* 'danger' is common from Bootstrap context */
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+        .flash-info {
+            background-color: rgba(23, 162, 184, 0.2);
+            color: #17a2b8;
+            border-color: #17a2b8;
+        }
+        .flash-warning {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border-color: #ffc107;
+        }
+
+
+        .ai-form fieldset {
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background-color: rgba(0, 150, 255, 0.03);
+        }
+
+        .ai-form legend {
+            font-family: 'Orbitron', sans-serif;
+            color: #00aaff;
+            font-size: 1.3em;
+            padding: 0 10px;
+            font-weight: bold;
+            width: auto; /* Important for legend to not take full width */
+        }
+        .ai-form legend .fas {
+            margin-right: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 400;
+            color: #c0c0c0;
+            font-size: 0.95em;
+        }
+        .form-group label .fas {
+            margin-right: 6px;
+            color: #00aaff;
+        }
+
+        .form-group input[type="text"],
+        .form-group select,
+        .form-group textarea { /* Added textarea for consistency */
+            width: calc(100% - 24px); /* Account for padding */
+            padding: 12px;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box; /* Ensure padding doesn't add to width */
+        }
+         .form-group textarea {
+            min-height: 100px; /* Default height for textarea */
+            resize: vertical; /* Allow vertical resizing */
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #666;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00aaff;
+            box-shadow: 0 0 8px rgba(0, 170, 255, 0.3);
+        }
+
+        .form-group small {
+            display: block;
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Drag and Drop File Input Styling */
+        .file-input-hidden {
+            display: none;
+        }
+
+        .drop-zone-visible {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            border: 2px dashed #444;
+            border-radius: 6px;
+            background-color: #2a2a2a;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: 120px; /* Give it some default height */
+        }
+
+        .drop-zone-visible .fas {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #00aaff;
+        }
+        .drop-zone-text {
+            font-size: 1em;
+        }
+        .file-name-display {
+            font-size: 0.9em;
+            color: #c0c0c0;
+            margin-top: 8px;
+            font-style: italic;
+            word-break: break-all;
+        }
+
+
+        .drop-zone-visible:hover,
+        .drop-zone-visible.drag-over {
+            border-color: #00aaff;
+            background-color: #333;
+            color: #e0e0e0;
+        }
+        .drop-zone-visible.file-selected {
+            border-style: solid;
+            border-color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        .drop-zone-visible.file-selected .fas{
+            color: #28a745;
+        }
+        .drop-zone-visible.drag-error { /* Style for invalid file type */
+            border-color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        .drop-zone-visible.drag-error .fas {
+            color: #dc3545;
+        }
+
+
+        .conditional-section {
+            padding: 20px;
+            margin-top: 15px;
+            border-left: 3px solid #00aaff;
+            background-color: rgba(0, 100, 180, 0.05);
+            border-radius: 0 6px 6px 0;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .parameters-title { /* For general parameter section titles if needed */
+            font-size: 1.1em;
+            color: #00aaff;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .parameters-title .fas {
+            margin-right: 8px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .submit-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .submit-button {
+            background: linear-gradient(45deg, #007bff, #00aaff);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px; /* Pill shape */
+            font-size: 1.1em;
+            font-weight: bold;
+            font-family: 'Roboto', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+        .submit-button .fas {
+            margin-right: 8px;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.5);
+            background: linear-gradient(45deg, #0069d9, #0099e6);
+        }
+
+        .submit-button:active {
+            transform: translateY(0px);
+            box-shadow: 0 2px 10px rgba(0, 123, 255, 0.4);
+        }
+        
+        .logout-button {
+            background: linear-gradient(45deg, #6c757d, #495057);
+            color: white;
+            padding: 8px 18px; /* Smaller than main submit */
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-family: 'Roboto', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            text-decoration: none; /* If it's an <a> tag */
+            display: inline-block; /* For <a> tag */
+            margin-top: 10px;
+        }
+        .logout-button .fas { margin-right: 6px; }
+        .logout-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #5a6268, #343a40);
+        }
+
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 150, 255, 0.2);
+            font-size: 0.9em;
+            color: #888;
+        }
+        /* Navbar placeholder - if you add a fixed top navbar like in login/register */
+        /* body { padding-top: 70px; } */ /* Add if navbar is fixed */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> AI Mailer</h1>
+            <p>Upload your contact list, compose your message, and send emails efficiently.</p>
+            {% if session.user_id %}
+             <a href="{{ url_for('logout') }}" class="logout-button"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            {% endif %}
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for category, message in messages %}
+                {% set f_category = 'danger' if category == 'error' else category %}
+                <div class="flash flash-{{ f_category }}">
+                    {% if f_category == 'success' %}<i class="fas fa-check-circle"></i>
+                    {% elif f_category == 'danger' %}<i class="fas fa-times-circle"></i>
+                    {% elif f_category == 'warning' %}<i class="fas fa-exclamation-triangle"></i>
+                    {% elif f_category == 'info' %}<i class="fas fa-info-circle"></i>
+                    {% endif %}
+                    {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" enctype="multipart/form-data" class="ai-form" action="{{ url_for('index') }}">
+            <!-- CSRF token if using Flask-WTF -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/> -->
+
+            <fieldset>
+                <legend><i class="fas fa-address-book"></i> Contact List</legend>
+                <div class="form-group">
+                    <label for="main_file">
+                        <i class="fas fa-file-excel"></i> Upload Contact File (CSV, Excel):
+                    </label>
+                    <input type="file" id="main_file" name="main_file" class="file-input-hidden" accept=".csv,.xlsx,.xls" required>
+                    <label for="main_file" class="drop-zone-visible" id="main_file_drop_label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span class="drop-zone-text">Drag & drop contact file or click to browse</span>
+                        <span class="file-name-display"></span>
+                    </label>
+                    <small>Allowed formats: .csv, .xlsx, .xls</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="column_name"><i class="fas fa-at"></i> Email Column Name:</label>
+                    <input type="text" id="column_name" name="column_name" placeholder="e.g., 'Email' or 'Contact_Email'" required>
+                    <small>The exact name of the column in your file that contains email addresses.</small>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-envelope-open-text"></i> Email Content</legend>
+                <div class="form-group">
+                    <label for="extra_input_subject_content"><i class="fas fa-heading"></i> Email Subject:</label>
+                    <input type="text" id="extra_input_subject_content" name="extra_input_Subject_content" placeholder="Enter the subject line for your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="extra_input_body_content"><i class="fas fa-paragraph"></i> Email Body:</label>
+                    <textarea id="extra_input_body_content" name="extra_input_body_content" placeholder="Compose the body of your email here. Plain text only."></textarea>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-paperclip"></i> Attachments (Optional)</legend>
+                <div class="form-group">
+                    <label for="conditional_choice"><i class="fas fa-question-circle"></i> Include an Attachment?</label>
+                    <select id="conditional_choice" name="conditional_choice">
+                        <option value="no" selected>No</option>
+                        <option value="yes">Yes</option>
+                    </select>
+                </div>
+
+                <div id="conditional-section" class="conditional-section" style="display: none;">
+                    <div class="form-group">
+                         <label for="secondary_file">
+                            <i class="fas fa-file-alt"></i> Upload Attachment File:
+                        </label>
+                        <input type="file" id="secondary_file" name="secondary_file" class="file-input-hidden" accept="*/*"> {/* accept anything for secondary */}
+                        <label for="secondary_file" class="drop-zone-visible" id="secondary_file_drop_label">
+                             <i class="fas fa-cloud-upload-alt"></i>
+                             <span class="drop-zone-text">Drag & drop attachment or click to browse</span>
+                             <span class="file-name-display"></span>
+                        </label>
+                         <small>Any file type can be attached.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="attachment_display_name"><i class="fas fa-signature"></i> Attachment Display Name (Optional):</label>
+                        <input type="text" id="attachment_display_name" name="attachment_display_name" placeholder="e.g., 'Brochure.pdf' or 'Monthly_Report.docx'">
+                        <small>If blank, the original filename will be used.</small>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="form-group submit-group">
+                <button type="submit" class="submit-button"><i class="fas fa-paper-plane"></i> Send Emails</button>
+            </div>
+        </form>
+
+        <footer>
+            <p>©  AI Mailer Solutions. Streamlining your communication.</p>
+        </footer>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const conditionalChoice = document.getElementById('conditional_choice');
+        const conditionalSection = document.getElementById('conditional-section');
+        const secondaryFileInput = document.getElementById('secondary_file');
+        const attachmentDisplayNameInput = document.getElementById('attachment_display_name');
+
+        if (conditionalChoice && conditionalSection) {
+            function toggleConditionalSection() {
+                if (conditionalChoice.value === 'yes') {
+                    conditionalSection.style.display = 'block';
+                    if (secondaryFileInput) secondaryFileInput.required = true;
+                    // attachmentDisplayNameInput is optional, so no required attribute change needed
+                } else {
+                    conditionalSection.style.display = 'none';
+                    if (secondaryFileInput) {
+                        secondaryFileInput.required = false;
+                        secondaryFileInput.value = ''; // Clear file input
+                        const changeEvent = new Event('change', { bubbles: true });
+                        secondaryFileInput.dispatchEvent(changeEvent); // To reset drop zone display
+                    }
+                    if (attachmentDisplayNameInput) {
+                        attachmentDisplayNameInput.value = ''; // Clear display name
+                    }
+                }
+            }
+            conditionalChoice.addEventListener('change', toggleConditionalSection);
+            toggleConditionalSection(); // Initial check on page load
+        }
+
+        function setupDropZone(fileInputElement, dropZoneLabelElement) {
+            if (!fileInputElement || !dropZoneLabelElement) return;
+
+            const fileNameDisplay = dropZoneLabelElement.querySelector('.file-name-display');
+            const dropZoneText = dropZoneLabelElement.querySelector('.drop-zone-text');
+            const defaultDropZoneText = dropZoneText.textContent;
+            const defaultIconClass = dropZoneLabelElement.querySelector('.fas').className;
+
+            dropZoneLabelElement.addEventListener('click', (e) => {
+                if (e.target !== fileInputElement) {
+                     fileInputElement.click();
+                }
+            });
+
+            fileInputElement.addEventListener('change', () => {
+                dropZoneLabelElement.classList.remove('drag-error'); // Clear previous error state
+                dropZoneLabelElement.querySelector('.fas').className = defaultIconClass; // Reset icon
+
+                if (fileInputElement.files.length > 0) {
+                    fileNameDisplay.textContent = `${fileInputElement.files[0].name}`;
+                    dropZoneText.textContent = "File selected:";
+                    dropZoneLabelElement.classList.add('file-selected');
+                    dropZoneLabelElement.querySelector('.fas').className = 'fas fa-check-circle'; // Success icon
+                } else {
+                    fileNameDisplay.textContent = '';
+                    dropZoneText.textContent = defaultDropZoneText;
+                    dropZoneLabelElement.classList.remove('file-selected');
+                }
+            });
+
+            dropZoneLabelElement.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZoneLabelElement.classList.add('drag-over');
+            });
+
+            ['dragleave', 'dragend'].forEach(type => {
+                dropZoneLabelElement.addEventListener(type, () => {
+                    dropZoneLabelElement.classList.remove('drag-over');
+                });
+            });
+
+            dropZoneLabelElement.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZoneLabelElement.classList.remove('drag-over');
+                dropZoneLabelElement.classList.remove('drag-error');
+                dropZoneLabelElement.querySelector('.fas').className = defaultIconClass; // Reset icon
+
+                if (e.dataTransfer.files.length > 0) {
+                    const droppedFile = e.dataTransfer.files[0];
+                    const allowedTypesString = fileInputElement.accept || "*/*";
+                    let isValidType = false;
+
+                    if (allowedTypesString === "*/*" || !allowedTypesString) {
+                        isValidType = true; // Allow any file if accept is "*" or not specified
+                    } else {
+                        const allowedTypesArray = allowedTypesString.split(',').map(t => t.trim().toLowerCase());
+                        const droppedFileType = "." + droppedFile.name.split('.').pop().toLowerCase();
+                        const droppedMimeType = droppedFile.type.toLowerCase();
+
+                        isValidType = allowedTypesArray.some(type => {
+                            if (type.startsWith('.')) { // Extension check (e.g., .csv)
+                                return droppedFileType === type;
+                            } else if (type.includes('/')) { // MIME type check (e.g., text/csv)
+                                if (type.endsWith('/*')) { // Wildcard MIME (e.g., image/*)
+                                    return droppedMimeType.startsWith(type.slice(0, -2));
+                                }
+                                return droppedMimeType === type;
+                            }
+                            return false;
+                        });
+                    }
+
+                    if (isValidType) {
+                        fileInputElement.files = e.dataTransfer.files;
+                        const changeEvent = new Event('change', { bubbles: true });
+                        fileInputElement.dispatchEvent(changeEvent);
+                    } else {
+                        fileNameDisplay.textContent = `Invalid file: ${droppedFile.name}. Allowed: ${allowedTypesString}`;
+                        dropZoneText.textContent = "Error:";
+                        fileInputElement.value = '';
+                        dropZoneLabelElement.classList.remove('file-selected');
+                        dropZoneLabelElement.classList.add('drag-error');
+                        dropZoneLabelElement.querySelector('.fas').className = 'fas fa-exclamation-triangle'; // Error icon
+                    }
+                }
+            });
+        }
+
+        const mainFileInput = document.getElementById('main_file');
+        const mainFileDropLabel = document.getElementById('main_file_drop_label');
+        setupDropZone(mainFileInput, mainFileDropLabel);
+
+        const secondaryFileDropLabel = document.getElementById('secondary_file_drop_label');
+        setupDropZone(secondaryFileInput, secondaryFileDropLabel); // secondaryFileInput already defined
+    });
+    </script>
+</body>
+</html>

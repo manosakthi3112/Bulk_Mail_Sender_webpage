@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - AI Mailer</title>
+    <!-- Bootstrap CSS (v5.3.0) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Custom CSS for AI Developer Theme -->
+    <style>
+        :root {
+            --ai-bg-primary: #0d1117;
+            --ai-bg-secondary: #161b22;
+            --ai-border-color: #30363d;
+            --ai-text-primary: #c9d1d9;
+            --ai-accent-blue: #58a6ff;
+            --ai-accent-blue-hover: #79c0ff;
+            --ai-accent-green: #3fb950;
+            --ai-accent-red: #f85149;
+            --ai-accent-yellow: #f0ad4e; /* For warnings */
+            --ai-accent-info: #58a6ff;   /* Using accent blue for info */
+            --ai-font-sans: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            --ai-font-mono: 'Consolas', 'Monaco', 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+
+        body {
+            background-color: var(--ai-bg-primary);
+            color: var(--ai-text-primary);
+            font-family: var(--ai-font-sans);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .navbar {
+            background-color: var(--ai-bg-secondary) !important;
+            border-bottom: 1px solid var(--ai-border-color);
+            box-shadow: 0 2px 10px rgba(88, 166, 255, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .navbar-brand, .nav-link {
+            color: var(--ai-accent-blue) !important;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            color: var(--ai-accent-blue-hover) !important;
+        }
+
+        .main-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 90px; /* Adjust for fixed navbar height */
+            padding-bottom: 20px;
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .register-card {
+            background-color: var(--ai-bg-secondary);
+            border: 1px solid var(--ai-border-color);
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(88, 166, 255, 0.2);
+            padding: 2.5rem;
+            width: 100%;
+        }
+
+        .form-title {
+            color: var(--ai-accent-blue);
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px rgba(88, 166, 255, 0.4);
+        }
+
+        label {
+            color: var(--ai-text-primary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+            text-align: left;
+        }
+
+        .form-control {
+            background-color: var(--ai-bg-primary);
+            color: var(--ai-text-primary);
+            border: 1px solid var(--ai-border-color);
+            font-family: var(--ai-font-mono);
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+            height: auto;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            background-color: var(--ai-bg-primary);
+            color: var(--ai-text-primary);
+            border-color: var(--ai-accent-blue);
+            box-shadow: 0 0 0 0.25rem rgba(88, 166, 255, 0.25);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: #6a737d;
+            opacity: 1;
+        }
+
+        /* Password help text styling */
+        .password-help-text {
+            color: var(--ai-text-primary);
+            font-size: 0.85em;
+            text-align: left;
+            /* margin-bottom: 1.5rem; Removed - parent div.mb-3 will handle spacing after group */
+        }
+        .password-help-text ol {
+            padding-left: 1.2rem; /* Indent list */
+            margin-bottom: 0.5rem;
+        }
+        .password-help-text ul {
+            padding-left: 1rem; /* Indent sub-list */
+            margin-bottom: 0.5rem;
+        }
+        .password-help-text li {
+            margin-bottom: 0.3rem;
+        }
+
+
+        .btn-primary {
+            background-color: var(--ai-accent-blue);
+            border-color: var(--ai-accent-blue);
+            color: var(--ai-bg-primary);
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            margin-top: 0.5rem; /* Added margin for better separation from last input */
+        }
+        .btn-primary:hover {
+            background-color: var(--ai-accent-blue-hover);
+            border-color: var(--ai-accent-blue-hover);
+            box-shadow: 0 0 10px rgba(88, 166, 255, 0.4);
+        }
+        .btn-primary:focus {
+            box-shadow: 0 0 0 0.25rem rgba(88, 166, 255, 0.25);
+        }
+
+        .mt-4 a {
+            color: var(--ai-accent-blue);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .mt-4 a:hover {
+            color: var(--ai-accent-blue-hover);
+            text-decoration: underline;
+        }
+
+        .toast-container {
+            z-index: 9999;
+        }
+        .toast {
+            background-color: var(--ai-bg-secondary) !important;
+            border: 1px solid var(--ai-border-color);
+            color: var(--ai-text-primary) !important;
+        }
+        .toast.bg-success { background-color: var(--ai-accent-green) !important; color: var(--ai-bg-primary) !important;}
+        .toast.bg-danger { background-color: var(--ai-accent-red) !important; color: var(--ai-bg-primary) !important;}
+        .toast.bg-warning { background-color: var(--ai-accent-yellow) !important; color: var(--ai-bg-primary) !important;}
+        .toast.bg-info { background-color: var(--ai-accent-info) !important; color: var(--ai-bg-primary) !important;}
+
+        .btn-close {
+            filter: invert(1) brightness(2);
+        }
+        .toast.bg-success .btn-close,
+        .toast.bg-danger .btn-close,
+        .toast.bg-warning .btn-close,
+        .toast.bg-info .btn-close {
+            filter: invert(0) brightness(0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('root') }}">
+                <i class="fas fa-robot me-2"></i> AI Mailer
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-sign-in-alt me-1"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('register') }}">
+                            <i class="fas fa-user-plus me-1"></i> Register
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages (Toasts) Container -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="toast-container position-fixed top-0 end-0 p-3" style="margin-top: 65px;">
+                {% for category, message in messages %}
+                    {% set toast_category = 'danger' if category == 'error' else category %}
+                    <div class="toast align-items-center bg-{{ toast_category }} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+                        <div class="d-flex">
+                            <div class="toast-body">{{ message }}</div>
+                            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <main role="main" class="main-container">
+        <div class="card register-card">
+            <div class="card-body">
+                <h2 class="form-title">
+                    <i class="fas fa-user-plus me-2"></i> Create Your AI Account
+                </h2>
+                <form method="POST" action="{{ url_for('register') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="your@email.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Gmail App Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Your 16-character Gmail App Password" aria-describedby="passwordHelp" required>
+                        <div id="passwordHelp" class="form-text password-help-text mt-1">
+                             <p class="mb-1">To use AI Mailer, you'll need a Gmail App Password. This will be your password for this service:</p>
+                            <ol>
+                                <li>Log in to your Gmail account.</li>
+                                <li>Go to your <a href="https://myaccount.google.com/security" target="_blank" rel="noopener noreferrer">Google Account Security Settings</a>.</li>
+                                <li>Under "Signing in to Google", ensure <strong>2-Step Verification</strong> is enabled.</li>
+                                <li>After enabling 2-Step Verification, scroll down and click <strong>App Passwords</strong>. (You may need to re-enter your Google password).</li>
+                                <li>On the App Passwords screen:
+                                    <ul>
+                                        <li>Under <strong>Select app</strong>, choose <strong>Mail</strong>.</li>
+                                        <li>Under <strong>Select device</strong>, choose <strong>Other (Custom name)</strong> and enter a name (e.g., "AI Mailer").</li>
+                                        <li>Click <strong>Generate</strong>.</li>
+                                    </ul>
+                                </li>
+                                <li>A 16-character password will appear. <strong>Copy this password and use it in the 'Gmail App Password' field above.</strong></li>
+                            </ol>
+                            <p class="mt-2">🔐 <strong>Note:</strong> This app password provides AI Mailer with secure access to your Gmail without exposing your main Gmail credentials.</p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm Gmail App Password</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter your App Password" required>
+                        <div class="invalid-feedback">Passwords do not match.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-user-check me-2"></i> Register Account
+                    </button>
+                </form>
+                <p class="mt-4 text-center">
+                    Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap Bundle with Popper (v5.3.0) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Toast initialization
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            toastElList.map(function (toastEl) {
+                var toast = new bootstrap.Toast(toastEl, {
+                    autohide: toastEl.dataset.bsDelay !== "0", // Check for "0" string
+                    delay: parseInt(toastEl.dataset.bsDelay) || 5000
+                });
+                if (toastEl.dataset.bsDelay !== "0") { // Only show if autohide is not disabled by delay="0"
+                    toast.show();
+                }
+                return toast;
+            });
+
+            // Client-side password match validation
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm_password');
+            const form = document.querySelector('form[method="POST"]'); // More specific selector
+
+            if (passwordInput && confirmPasswordInput && form) {
+                const validatePasswords = () => {
+                    if (passwordInput.value !== confirmPasswordInput.value) {
+                        confirmPasswordInput.setCustomValidity("Passwords do not match.");
+                        confirmPasswordInput.classList.add('is-invalid'); // Trigger Bootstrap's invalid style
+                    } else {
+                        confirmPasswordInput.setCustomValidity("");
+                        confirmPasswordInput.classList.remove('is-invalid');
+                        confirmPasswordInput.classList.add('is-valid'); // Optionally show valid style
+                    }
+                };
+
+                passwordInput.addEventListener('input', validatePasswords);
+                confirmPasswordInput.addEventListener('input', validatePasswords);
+
+                form.addEventListener('submit', function(event) {
+                    validatePasswords(); // Run our custom validation first
+
+                    // Then check Bootstrap's overall form validity
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated'); // Show validation states for all fields
+                });
+
+                // Clear validation on reset if you had a reset button
+                // form.addEventListener('reset', function() {
+                //     confirmPasswordInput.setCustomValidity("");
+                //     confirmPasswordInput.classList.remove('is-invalid', 'is-valid');
+                //     form.classList.remove('was-validated');
+                // });
+            }
+        });
+    </script>
+</body>
+</html>
