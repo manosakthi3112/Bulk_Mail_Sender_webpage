@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session, Response, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 import smtplib
+import re
 from flask_wtf import CSRFProtect
 from itsdangerous import URLSafeSerializer, BadSignature, Serializer
 
@@ -230,16 +231,38 @@ def msg_sender_attachment(subject, body, recipient_email, attachment_path, attac
     message['From'] = sender_email_address
     message['To'] = recipient_email
     message.attach(MIMEText(body, 'plain'))
-    actual_filename_for_mime = attachment_display_name if attachment_display_name else os.path.basename(attachment_path)
+
+    # Safe default values
+    if not attachment_path or not os.path.isfile(attachment_path):
+        print("Attachment path is invalid or file does not exist.")
+        return None
+
     try:
+        original_ext = os.path.splitext(attachment_path)[1]  # includes the dot, e.g., '.pdf'
+        if not original_ext:
+            print("Warning: attachment file has no extension.")
+
+        # Handle display name
+        if attachment_display_name:
+            attachment_display_name = re.sub(r'[^\w\-. ]', '', attachment_display_name.strip())
+            if '.' not in attachment_display_name and original_ext:
+                attachment_display_name += original_ext
+            actual_filename_for_mime = attachment_display_name
+        else:
+            actual_filename_for_mime = os.path.basename(attachment_path)
+
         with open(attachment_path, 'rb') as file:
             part = MIMEApplication(file.read(), Name=actual_filename_for_mime)
-        part['Content-Disposition'] = f'attachment; filename="{actual_filename_for_mime}"'
+
+        part.add_header('Content-Disposition', 'attachment', filename=actual_filename_for_mime)
         message.attach(part)
+
     except Exception as e:
-        print(f"Failed to attach file {actual_filename_for_mime}: {e}")
+        print(f"Failed to attach file: {e}")
         return None
+
     return message
+
 
 def send_email_with_session_credentials(message_obj):
     user_smtp_email = session.get('smtp_email')
